@@ -19,13 +19,14 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdlib.h>
-#include <stdbool.h>
 #include <math.h>
-#include "cmsis_os2.h"
-#include "rt_list.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
+#include "rt_list.h"
 #include "node_convert.h"
+#include "NodeSDKConfig.h"
 /* Exported constants --------------------------------------------------------*/
 #define SENSOR_MODULE_MAX       (3)         //传感器模块的最大成员数
 #define SENSOR_ERROR_DATA       0XFFFFFFFF  //错误数据
@@ -96,6 +97,9 @@ typedef enum
     SENSOR_CMD_STATUS_GET,  //状态获取
     SENSOR_CMD_DATA_SET,    //数据设置
     SENSOR_CMD_DATA_GET,    //数据获取
+    SENSOR_CMD_GET_OTHER,   //获取其他数据
+    SENSOR_CMD_SET_OTHER,   //设置其他数据
+    SENSOR_CMD_SET_ISR_BACK,//设置中断回调
 }sensor_cmd_e;
 /* Exported types ------------------------------------------------------------*/
 typedef struct sensor_device *sensor_device_t;
@@ -134,7 +138,8 @@ struct sensor_device
 {
     char *name;
 
-    rt_list_t node;
+    rt_list_t sensor_node;          //传感器链表
+    rt_list_t cfg_node;             //配置链表
 
     const sensor_ops_t  *ops;
     sensor_module_t     *module;    //模块,不同传感器在同一模块中使用,需要填写此内容
@@ -151,7 +156,7 @@ bool sensor_open(sensor_device_t dev);
 bool sensor_close(sensor_device_t dev);
 bool sensor_collect(sensor_device_t dev);
 bool sensor_lpm(sensor_device_t dev, bool lpm_flag);
-bool sensor_data_control(sensor_device_t dev, sensor_cmd_e cmd, void *data, void *arg);
+bool sensor_control(sensor_device_t dev, sensor_cmd_e cmd, void *data, void *arg);
 
 #ifdef __cplusplus
 extern "C" }

@@ -44,8 +44,8 @@ typedef bool (*allow_process_t)(sensor_device_t sensor, void *cfg);
 typedef void (*sensor_process_t)(sensor_device_t sensor, void *cfg, uint8_t num);
 typedef struct 
 {
-    allow_process_t  allow;     //允许执行任务判断
-    sensor_process_t handler;   //传感器任务处理
+    allow_process_t     allow;     //允许执行任务判断
+    sensor_process_t    handler;   //传感器任务处理
 }sensor_process_ops_t;
 
 typedef struct sensor_builder sensor_builder_t;
@@ -99,6 +99,8 @@ struct sensor_builder
 
     uint8_t current_id;
     uint8_t process_num;
+    //true: 每个任务都需要判断 false: 只在第一次执行判断
+    bool    allow_mode; 
     sensor_process_ops_t *process;
 };
 /* Exported constants --------------------------------------------------------*/

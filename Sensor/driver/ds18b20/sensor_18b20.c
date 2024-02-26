@@ -158,6 +158,9 @@ static bool ds18b20_close(sensor_device_t dev)
 static bool dsb1820_control(sensor_device_t dev, sensor_cmd_e cmd, void *data, void *arg)
 {
     FIND_CFG(ds18b20_driver_cfg_t, dev);
+    if(data == NULL) {
+        return false;
+    }
     switch(cmd) {
         case SENSOR_CMD_STATUS_SET:
         {

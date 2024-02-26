@@ -34,7 +34,7 @@ bool sensor_register_fun(sensor_device_t dev)
     if(dev == NULL || dev->name == NULL) {
         return false;
     }else {
-        rt_list_insert_before(&_sensor_list, &dev->node);
+        rt_list_insert_before(&_sensor_list, &dev->sensor_node);
         return true;
     }
 }
@@ -54,7 +54,7 @@ sensor_device_t sensor_obj_get(const char *reg_name)
     }
 
     sensor_device_t sensor = NULL;
-    rt_list_for_each_entry(sensor, &_sensor_list, node) {
+    rt_list_for_each_entry(sensor, &_sensor_list, sensor_node) {
         if(strcmp(sensor->name, reg_name) == 0) {
             return sensor;
         }
@@ -203,7 +203,7 @@ bool sensor_lpm(sensor_device_t dev, bool lpm_flag)
     return ret;
 }
 /**
- * @brief  传感器数据控制
+ * @brief  传感器控制
  * @note   
  * @param  dev: 传感器设备
  * @param  cmd: 控制命令
@@ -211,7 +211,7 @@ bool sensor_lpm(sensor_device_t dev, bool lpm_flag)
  * @param  *arg: 数据参数
  * @retval 错误码
  */
-bool sensor_data_control(sensor_device_t dev, sensor_cmd_e cmd, void *data, void *arg)
+bool sensor_control(sensor_device_t dev, sensor_cmd_e cmd, void *data, void *arg)
 {
     if(dev == NULL || dev->ops == NULL || dev->ops->control == NULL) {
         return false;

@@ -116,13 +116,23 @@ void sensor_director_process(void)
         if(builder->sensor == NULL) {
             continue;
         }
-        for(uint8_t i = 0; i < builder->process_num; i++) {
-            builder->current_id = i;
-            if(builder->process[i].allow != NULL) {
-                if(builder->process[i].allow(builder->sensor, builder->cfg) == false) {
+        if(builder->allow_mode == false) {
+            if(builder->process->allow != NULL) {
+                if(builder->process->allow(builder->sensor, builder->cfg) == false) {
                     continue;
                 }
             }
+        }
+        for(uint8_t i = 0; i < builder->process_num; i++) {
+            builder->current_id = i;
+            if(builder->allow_mode == true) {
+                if(builder->process[i].allow != NULL) {
+                    if(builder->process[i].allow(builder->sensor, builder->cfg) == false) {
+                        continue;
+                    }
+                }
+            }
+
             if(builder->process[i].handler != NULL) {
                 builder->process[i].handler(builder->sensor, builder->cfg, builder->cfg_num);
             }
