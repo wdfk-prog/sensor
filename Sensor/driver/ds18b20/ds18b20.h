@@ -1,11 +1,11 @@
 /**
  * @File Name: ds18b20.h
  * @brief  
- * @Author : huangly@milesight.com
+ * @Author : 
  * @Version : 1.0
  * @Creat Date : 2024-01-22
  * 
- * @copyright Copyright (c) 2024 星纵物联科技有限公司
+ * @copyright Copyright (c) 2024 
  * @par 修改日志:
  * Date           Version     Author  Description
  * 2024-01-22     v1.0        huagnly 内容

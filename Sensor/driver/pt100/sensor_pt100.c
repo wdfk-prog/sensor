@@ -1,11 +1,11 @@
 /**
  * @File Name: sensor_pt100.c
  * @brief
- * @Author : huangly@milesight.com
+ * @Author : 
  * @Version : 1.0
  * @Creat Date : 2023-06-19
  *
- * @copyright Copyright (c) 2023 星纵物联科技有限公司
+ * @copyright Copyright (c) 2023 
  * @par 修改日志:
  * Date           Version     Author  Description
  * 2023-06-19     v1.0        huagnly 内容
