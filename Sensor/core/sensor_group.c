@@ -196,7 +196,7 @@ void group_collect(sensor_device_t input, void *cfg, uint8_t num)
                 sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
             } else {
                 status = DATA_STATUS_INVALID;
-                sensor_control(sensor, SENSOR_CMD_STATUS_SET, &status, &i);
+                sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &i);
             }
         }
     }
@@ -286,13 +286,13 @@ void group_data_check(sensor_device_t input, void *cfg, uint8_t num)
     data_status_e status = DATA_STATUS_NONE;
     sensor_device_t sensor;
     rt_list_for_each_entry(sensor, &_sensor_list, cfg_node) {
-        sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &i);
+        sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &id);
         if(status == DATA_STATUS_INVALID) {
-            data = SENSOR_ERROR_DATA / sensor_cfg[i].unit;
-            sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
+            data = (int16_t)SENSOR_ERROR_DATA;
+            sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &id);
         } else if(status == DATA_STATUS_OUTRANGE) {
-            data = SENSOR_OUTRANGE_DATA / sensor_cfg[i].unit;
-            sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
+            data = (int16_t)SENSOR_OUTRANGE_DATA;
+            sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &id);
         }
 
         sensor_control(sensor, SENSOR_CMD_DATA_GET, &data, &id);

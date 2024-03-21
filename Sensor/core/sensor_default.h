@@ -51,7 +51,7 @@ typedef struct
      * @note   框架已有合法性检测传入
      * @retval 返回OK表示数据有效,其他表示数据无效
      */
-    void    (*alarm_handler)(sensor_default_cfg_t cfg, void *data);
+    void    (*alarm_handler)(sensor_device_t sensor, sensor_default_cfg_t cfg, void *data);
 }sensor_default_ops_t;
 /**
  * @brief  传感器默认配置类
@@ -61,11 +61,16 @@ struct sensor_default_cfg
 {
     uint8_t id;                         //配置标识ID
     //配置项
-    float  power;                       //传感器功耗
-    uint8_t unit;                       //传感器单位
+    float   power;                      //传感器功耗
+    float   unit;                       //传感器单位
     uint8_t allow_retry_collect_cnt;    //允许重采次数
     uint8_t allow_collect_fail_cnt;     //允许采集失败次数
     uint32_t cal_addr;                  //校准数据存储地址
+    struct 
+    {
+        float error;                    //错误数据状态
+        float outrange;                 //超量程数据状态
+    }data_status;
     struct 
     {
         int16_t max;            //检测最大值

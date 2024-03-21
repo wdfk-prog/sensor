@@ -204,9 +204,9 @@ void default_calibration(sensor_device_t sensor, void *cfg, uint8_t num)
         if(sensor_params.calibration_enable == true) {
             uint8_t data_id = SENSOR_DATA_GET_RAW - i;
             sensor_control(sensor, SENSOR_CMD_DATA_GET, &data, &data_id);
-            int16_t temp = (int16_t)(data * sensor_cfg[i].unit);
-            printf_debug("[%s]num[%d][original]%d[cal]%d\r\n", sensor->name, i, temp, sensor_params.calibration_value);
-            data = (float)(temp + sensor_params.calibration_value) / sensor_cfg[i].unit;
+            float cal = (float)sensor_params.calibration_value / sensor_cfg[i].unit;
+            printf_debug("[%s]num[%d][cal]%s\r\n", sensor->name, i, ftoc(cal, 3));
+            data += cal;
             sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
         }
     }
@@ -224,6 +224,11 @@ void default_range_check(sensor_device_t sensor, void *cfg, uint8_t num)
     }
     float data = 0;
     for(uint8_t i = 0; i < num; i++) {
+        data_status_e status = DATA_STATUS_NONE;
+        sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &i);
+        if(status != DATA_STATUS_VALID) {
+            continue;
+        }
         sensor_default_cfg_t sensor_cfg = (sensor_default_cfg_t)cfg;
         printf_debug("[%s]num[%d]range[%d ~ %d]\r\n", sensor->name, i, sensor_cfg[i].check.min, sensor_cfg[i].check.max);
 
@@ -252,10 +257,10 @@ void default_data_check(sensor_device_t sensor, void *cfg, uint8_t num)
         sensor_default_cfg_t sensor_cfg = (sensor_default_cfg_t)cfg;
         sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &i);
         if(status == DATA_STATUS_INVALID) {
-            data = SENSOR_ERROR_DATA / sensor_cfg[i].unit;
+            data = sensor_cfg[i].data_status.error;
             sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
         } else if(status == DATA_STATUS_OUTRANGE) {
-            data = SENSOR_OUTRANGE_DATA / sensor_cfg[i].unit;
+            data = sensor_cfg[i].data_status.outrange;
             sensor_control(sensor, SENSOR_CMD_DATA_SET, &data, &i);
         }
 
@@ -275,16 +280,13 @@ void default_alarm(sensor_device_t sensor, void *cfg, uint8_t num)
     if(cfg == NULL) {
         return;
     }
-    data_status_e status = DATA_STATUS_NONE;
     sensor_default_cfg_t sensor_cfg = (sensor_default_cfg_t)cfg;
     for(uint8_t i = 0; i < num; i++) {
-        sensor_control(sensor, SENSOR_CMD_STATUS_GET, &status, &i);
-        if(sensor_cfg[i].ops.alarm_handler == NULL || status != DATA_STATUS_VALID) {
+        if(sensor_cfg[i].ops.alarm_handler == NULL) {
             return;
         }
-
         float data = 0;
         sensor_control(sensor, SENSOR_CMD_DATA_GET, &data, &i);
-        sensor_cfg[i].ops.alarm_handler(sensor_cfg, &data);
+        sensor_cfg[i].ops.alarm_handler(sensor, sensor_cfg, &data);
     }
 }
